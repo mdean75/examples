@@ -11,7 +11,6 @@
 package main
 
 import (
-	"context"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -77,9 +76,8 @@ func main() {
 }
 
 func (c *controller) run() {
-	ctx := context.Background()
 	r := mux.NewRouter().StrictSlash(true)
-	r.Handle("/stop", c.stop(ctx))
+	r.Handle("/stop", c.stop())
 	r.Handle("/start", c.start())
 	r.Handle("/worker/add", c.addWorker())
 
@@ -115,7 +113,7 @@ func (c *controller) startWorker() {
 }
 
 // stop sends a signal to all workers in the pool to complete tasks in flight and terminate, stopping consumption from the work queue.
-func (c *controller) stop(ctx context.Context) http.HandlerFunc {
+func (c *controller) stop() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		c.done <- struct{}{}
 		close(c.done)
